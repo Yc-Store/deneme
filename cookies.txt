@@ -1,0 +1,1 @@
+yt-dlp --cookies-from-browser chrome https://music.youtube.com
