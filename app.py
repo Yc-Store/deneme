@@ -7,7 +7,7 @@ import os
 app = Flask(__name__, static_folder="static")
 ymusic = YTMusic()
 
-# Şarkı arama endpointi
+# Şarkı arama
 @app.route("/search", methods=["GET"])
 def search():
     query = request.args.get("q")
@@ -22,30 +22,30 @@ def search():
             })
     return jsonify(songs)
 
-# Ham link çekme (yt-dlp)
+# Ham link çekme
 @app.route("/get_url/<video_id>")
 def get_url(video_id):
     ydl_opts = {
-        'quiet': True,
-        'format': 'bestaudio/best',
-        'noplaylist': True,
+        "quiet": True,
+        "format": "bestaudio/best",
+        "noplaylist": True,
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(f"https://music.youtube.com/watch?v={video_id}", download=False)
-        url = info['url']
+        url = info["url"]
     return jsonify({"url": url})
 
-# Proxy stream sistemi
+# Proxy stream
 @app.route("/stream/<video_id>")
 def stream(video_id):
     ydl_opts = {
-        'quiet': True,
-        'format': 'bestaudio/best',
-        'noplaylist': True,
+        "quiet": True,
+        "format": "bestaudio/best",
+        "noplaylist": True,
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(f"https://music.youtube.com/watch?v={video_id}", download=False)
-        url = info['url']
+        url = info["url"]
 
     def generate():
         with requests.get(url, stream=True) as r:
@@ -55,13 +55,10 @@ def stream(video_id):
 
     return Response(generate(), content_type="audio/webm")
 
-# index.html dosyasını static klasörden gönder
+# index.html
 @app.route("/")
 def index():
     return send_from_directory("static", "index.html")
 
 if __name__ == "__main__":
-    # static klasörü oluşturulmadıysa oluştur
-    if not os.path.exists("static"):
-        os.makedirs("static")
-    app.run(debug=True, port=5000)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
