@@ -40,16 +40,14 @@
       });
     }
 
-    async function playSong(videoId, title, artist) {
+    function playSong(videoId, title, artist) {
       let player = document.getElementById("player");
       player.src = `/stream/${videoId}`;
       player.play();
 
-      // Meta verileri ve kapak resmi göster
       document.getElementById("songInfo").innerHTML = `
         <h2>${title}</h2>
         <h3>${artist}</h3>
-        <p><b>Video ID:</b> ${videoId}</p>
         <img id="cover" src="https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg" alt="Kapak">
       `;
     }
