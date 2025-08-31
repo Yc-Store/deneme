@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Müzik Platformu</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #111; color: #fff; text-align: center; }
+    input { padding: 10px; width: 60%; margin-top: 20px; border-radius: 8px; border: none; }
+    button { padding: 10px 20px; margin-left: 10px; border: none; border-radius: 8px; background: #1db954; color: white; cursor: pointer; }
+    ul { list-style: none; padding: 0; margin-top: 20px; }
+    li { padding: 10px; background: #222; margin: 5px auto; width: 60%; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+    li:hover { background: #333; }
+    audio { margin-top: 20px; width: 80%; }
+    #songInfo { margin-top: 20px; }
+    #cover { width: 300px; border-radius: 12px; margin-top: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.6); }
+  </style>
+</head>
+<body>
+  <h1>🎵 Online Müzik Platformu</h1>
+  <input type="text" id="query" placeholder="Şarkı ara...">
+  <button onclick="searchSong()">Ara</button>
+
+  <ul id="results"></ul>
+  <div id="songInfo"></div>
+  <audio id="player" controls></audio>
+
+  <script>
+    async function searchSong() {
+      let q = document.getElementById("query").value;
+      let res = await fetch(`/search?q=${encodeURIComponent(q)}`);
+      let data = await res.json();
+      let list = document.getElementById("results");
+      list.innerHTML = "";
+
+      data.forEach(song => {
+        let li = document.createElement("li");
+        li.textContent = `${song.title} - ${song.artist}`;
+        li.onclick = () => playSong(song.videoId, song.title, song.artist);
+        list.appendChild(li);
+      });
+    }
+
+    async function playSong(videoId, title, artist) {
+      let player = document.getElementById("player");
+      player.src = `/stream/${videoId}`;
+      player.play();
+
+      // Meta verileri ve kapak resmi göster
+      document.getElementById("songInfo").innerHTML = `
+        <h2>${title}</h2>
+        <h3>${artist}</h3>
+        <p><b>Video ID:</b> ${videoId}</p>
+        <img id="cover" src="https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg" alt="Kapak">
+      `;
+    }
+  </script>
+</body>
+</html>
